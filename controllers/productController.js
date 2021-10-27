@@ -38,17 +38,7 @@ exports.createProduct = async (req, res) => {
         }
 
         const galleryImages = [];
-        const cloudinaryImageUploadMethod = async file => {
-            return new Promise(resolve => {
-                cloudinary.uploader.upload(file, (err, res) => {
-                    if (err) return res.status(500).send("upload image error")
-                    resolve({
-                        res: res.secure_url
-                    })
-                }
-                )
-            })
-        }
+
         if (req.files && req.files.gallery) {
             for (const file of req.files.gallery) {
 
@@ -56,14 +46,15 @@ exports.createProduct = async (req, res) => {
                 // const galleryImage = `/uploads/media/${file.filename}`;
                 // galleryImages.push(galleryImage);
 
+                // Upload to Cloudinary
                 const { path } = file;
-                const newPath = await cloudinaryImageUploadMethod(path);
-                galleryImages.push(newPath);
+                let filePath = await cloudinary.uploader.upload(path)
+                let fileUrl = filePath.secure_url;
+                galleryImages.push(fileUrl);
             }
 
             productInfo.gallery = galleryImages;
         }
-
 
 
         try {
@@ -130,43 +121,58 @@ exports.updateProduct = async (req, res) => {
                 const rootPath = await getRootPath();
 
                 if (req.files && req.files.thumbnail) {
-                    productInfo.thumbnail = `/uploads/media/${req.files.thumbnail[0].filename}`;
+
+                    // Upload to Local Folder
+                    // productInfo.thumbnail = `/uploads/media/${req.files.thumbnail[0].filename}`;
+
+                    // if (oldProduct.thumbnail) {
+                    //     const filePath = rootPath + '/public' + oldProduct.thumbnail
+                    //     // Remove old thumbnail
+                    //     fs.unlink(filePath, (err) => {
+                    //         if (err) {
+                    //             console.log(err.message)
+                    //         }
+                    //     })
+
+                    // }
 
 
-
-
-                    if (oldProduct.thumbnail) {
-                        const filePath = rootPath + '/public' + oldProduct.thumbnail
-                        // Remove old thumbnail
-                        fs.unlink(filePath, (err) => {
-                            if (err) {
-                                console.log(err.message)
-                            }
-                        })
-
-                    }
+                    // Upload to Cloudinary
+                    let filePath = await cloudinary.uploader.upload(req.files.thumbnail[0].path)
+                    productInfo.thumbnail = filePath.secure_url;
                 }
 
                 const galleryImages = [];
                 if (req.files && req.files.gallery) {
-                    req.files.gallery.forEach(file => {
-                        const galleryImage = `/uploads/media/${file.filename}`;
-                        galleryImages.push(galleryImage);
-                    });
-                    productInfo.gallery = galleryImages;
 
-                    if (oldProduct.gallery.length > 0) {
+                    // Upload to Local Folder
+                    // for (const file of req.files.gallery) {
+                    //     const galleryImage = `/uploads/media/${file.filename}`;
+                    //     galleryImages.push(galleryImage);
+                    // }
 
-                        // Remove Old images
-                        oldProduct.gallery.forEach(item => {
-                            const filePath = rootPath + '/public' + item
-                            fs.unlink(filePath, (err) => {
-                                if (err) {
-                                    console.log(err)
-                                }
-                            })
-                        });
+                     // Remove Old images
+                    // if (oldProduct.gallery.length > 0) {
+                    //     oldProduct.gallery.forEach(item => {
+                    //         const filePath = rootPath + '/public' + item
+                    //         fs.unlink(filePath, (err) => {
+                    //             if (err) {
+                    //                 console.log(err)
+                    //             }
+                    //         })
+                    //     });
+                    // }
+
+                    // Upload to Cloudinary
+                    for (const file of req.files.gallery) {
+        
+                        // Upload to Cloudinary
+                        const { path } = file;
+                        let filePath = await cloudinary.uploader.upload(path)
+                        let fileUrl = filePath.secure_url;
+                        galleryImages.push(fileUrl);
                     }
+                    productInfo.gallery = galleryImages;
 
                 }
 
