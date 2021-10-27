@@ -17,7 +17,7 @@ exports.createProduct = async (req, res) => {
         }
 
         if (salePrice) productInfo.salePrice = salePrice;
-        if (categories) productInfo.categories = categories;
+        if (categories) productInfo.categories = categories.split(',');
         if (sizes) productInfo.sizes = sizes.split(',');
         if (colors) productInfo.colors = colors.split(',');
         if (colors || sizes) productInfo.variation = true;
@@ -91,7 +91,7 @@ exports.updateProduct = async (req, res) => {
                 }
 
                 if (salePrice) productInfo.salePrice = salePrice;
-                if (categories) productInfo.categories = categories;
+                if (categories) productInfo.categories = categories.split(',');
                 if (sizes) productInfo.sizes = sizes.split(',');
                 if (colors) productInfo.colors = colors.split(',');
                 if (colors || sizes) {
