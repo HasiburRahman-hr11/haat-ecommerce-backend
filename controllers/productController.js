@@ -1,6 +1,7 @@
 const Product = require('../models/Product');
 const Category = require('../models/Category');
 const fs = require('fs');
+const cloudinary = require('../utils/cloudinary');
 const getRootPath = require('../utils/getRootPath');
 
 // Add New Product 
@@ -27,14 +28,28 @@ exports.createProduct = async (req, res) => {
         // TODO: Implement File system for Thumbnails and gallery
 
         if (req.files && req.files.thumbnail) {
-            productInfo.thumbnail = `/uploads/media/${req.files.thumbnail[0].filename}`;
+
+            // Upload to Local Folder
+            // productInfo.thumbnail = `/uploads/media/${req.files.thumbnail[0].filename}`;
+
+            // Upload to Cloudinary
+            let filePath = await cloudinary.uploader.upload(req.files.thumbnail[0].path)
+            productInfo.thumbnail = filePath.secure_url;
         }
 
         const galleryImages = [];
         if (req.files && req.files.gallery) {
-            req.files.gallery.forEach(file => {
-                const galleryImage = `/uploads/media/${file.filename}`;
-                galleryImages.push(galleryImage);
+            req.files.gallery.forEach( async(file) => {
+
+                // Upload to Local Folder
+                // const galleryImage = `/uploads/media/${file.filename}`;
+             
+
+                 // Upload to Cloudinary
+                 const galleryImage = await cloudinary.uploader.upload(file.path)
+
+                 galleryImages.push(galleryImage);
+
             });
 
             productInfo.gallery = galleryImages;
