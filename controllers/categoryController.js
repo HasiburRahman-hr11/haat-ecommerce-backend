@@ -23,7 +23,7 @@ exports.createCategory = async (req, res) => {
                     // Upload to Cloudinary
                     let filePath = await cloudinary.uploader.upload(req.file.path, { folder: "haatEcommerce" });
 
-                    catObj.thumbnail = filePath;
+                    catObj.thumbnail = filePath.secure_url;
                 }
 
                 const newCategory = new Category(catObj);
@@ -79,7 +79,7 @@ exports.updateCategory = async (req, res) => {
 
                 // Upload to Cloudinary
                 let filePath = await cloudinary.uploader.upload(req.file.path, { folder: "haatEcommerce" });
-                catObj.thumbnail = filePath;
+                catObj.thumbnail = filePath.secure_url;
 
             }
 
