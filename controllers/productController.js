@@ -43,12 +43,12 @@ exports.createProduct = async (req, res) => {
 
                 // Upload to Local Folder
                 // const galleryImage = `/uploads/media/${file.filename}`;
-             
+                // galleryImages.push(galleryImage);
 
                  // Upload to Cloudinary
                  const galleryImage = await cloudinary.uploader.upload(file.path)
 
-                 galleryImages.push(galleryImage);
+                 galleryImages.push(galleryImage.secure_url);
 
             });
 
