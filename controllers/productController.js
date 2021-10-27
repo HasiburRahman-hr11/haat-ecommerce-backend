@@ -38,19 +38,28 @@ exports.createProduct = async (req, res) => {
         }
 
         const galleryImages = [];
+        const cloudinaryImageUploadMethod = async file => {
+            return new Promise(resolve => {
+                cloudinary.uploader.upload(file, (err, res) => {
+                    if (err) return res.status(500).send("upload image error")
+                    resolve({
+                        res: res.secure_url
+                    })
+                }
+                )
+            })
+        }
         if (req.files && req.files.gallery) {
-            req.files.gallery.forEach(async (file, ind) => {
+            for (const file of req.files.gallery) {
 
                 // Upload to Local Folder
                 // const galleryImage = `/uploads/media/${file.filename}`;
                 // galleryImages.push(galleryImage);
 
-                // Upload to Cloudinary
-                let filePath = await cloudinary.uploader.upload(req.files.gallery[ind].path)
-
-                galleryImages.push(filePath.secure_url);
-
-            });
+                const { path } = file;
+                const newPath = await cloudinaryImageUploadMethod(path);
+                galleryImages.push(newPath);
+            }
 
             productInfo.gallery = galleryImages;
         }
