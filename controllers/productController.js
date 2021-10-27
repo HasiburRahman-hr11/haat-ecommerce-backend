@@ -39,16 +39,16 @@ exports.createProduct = async (req, res) => {
 
         const galleryImages = [];
         if (req.files && req.files.gallery) {
-            req.files.gallery.forEach( async(file) => {
+            req.files.gallery.forEach(async (file, ind) => {
 
                 // Upload to Local Folder
                 // const galleryImage = `/uploads/media/${file.filename}`;
                 // galleryImages.push(galleryImage);
 
-                 // Upload to Cloudinary
-                 const galleryImage = await cloudinary.uploader.upload(file.path)
+                // Upload to Cloudinary
+                let filePath = await cloudinary.uploader.upload(req.files.gallery[ind].path)
 
-                 galleryImages.push(galleryImage.secure_url);
+                galleryImages.push(filePath.secure_url);
 
             });
 
