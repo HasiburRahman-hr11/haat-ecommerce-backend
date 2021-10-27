@@ -165,7 +165,7 @@ exports.getCart = async (req, res) => {
 
             const cart = await Cart.findOne({ userId: userId });
             if (!cart) {
-                return res.status(200).json({ message: 'No cart found' })
+                return res.status(404).json({ message: 'No cart found' })
             }
 
             res.status(200).json(cart);
