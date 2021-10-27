@@ -91,7 +91,7 @@ exports.updateProduct = async (req, res) => {
                 }
 
                 if (salePrice) productInfo.salePrice = salePrice;
-                if (categories) productInfo.categories = categories.split(',');
+                if (categories) productInfo.categories = categories;
                 if (sizes) productInfo.sizes = sizes.split(',');
                 if (colors) productInfo.colors = colors.split(',');
                 if (colors || sizes) {
