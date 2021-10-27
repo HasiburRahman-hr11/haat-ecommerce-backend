@@ -33,7 +33,7 @@ exports.createProduct = async (req, res) => {
             // productInfo.thumbnail = `/uploads/media/${req.files.thumbnail[0].filename}`;
 
             // Upload to Cloudinary
-            let filePath = await cloudinary.uploader.upload(req.files.thumbnail[0].path)
+            let filePath = await cloudinary.uploader.upload(req.files.thumbnail[0].path ,{ folder: "haatEcommerce"})
             productInfo.thumbnail = filePath.secure_url;
         }
 
@@ -48,7 +48,7 @@ exports.createProduct = async (req, res) => {
 
                 // Upload to Cloudinary
                 const { path } = file;
-                let filePath = await cloudinary.uploader.upload(path)
+                let filePath = await cloudinary.uploader.upload(path,{ folder: "haatEcommerce"})
                 let fileUrl = filePath.secure_url;
                 galleryImages.push(fileUrl);
             }
