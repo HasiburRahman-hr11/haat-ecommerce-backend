@@ -1,5 +1,6 @@
 const Category = require('../models/Category');
 const Product = require('../models/Product');
+const cloudinary = require('../utils/cloudinary');
 const fs = require('fs');
 const getRootPath = require('../utils/getRootPath');
 
@@ -16,7 +17,13 @@ exports.createCategory = async (req, res) => {
                 }
 
                 if (req.file) {
-                    catObj.thumbnail = `/uploads/media/${req.file.filename}`;
+                    // Upload to Local Folder
+                    // catObj.thumbnail = `/uploads/media/${req.file.filename}`;
+
+                    // Upload to Cloudinary
+                    let filePath = await cloudinary.uploader.upload(req.file.path, { folder: "haatEcommerce" });
+
+                    catObj.thumbnail = filePath;
                 }
 
                 const newCategory = new Category(catObj);
@@ -57,17 +64,22 @@ exports.updateCategory = async (req, res) => {
             }
 
             if (req.file) {
-                const rootPath = await getRootPath();
-                const filePath = rootPath + '/public' + category.thumbnail
-                catObj.thumbnail = `/uploads/media/${req.file.filename}`;
+                // Upload to Local Folder
+                // const rootPath = await getRootPath();
+                // const filePath = rootPath + '/public' + category.thumbnail
+                // catObj.thumbnail = `/uploads/media/${req.file.filename}`;
 
-                if (category.thumbnail) {
-                    fs.unlink(filePath, (err) => {
-                        if (err) {
-                            console.log(err)
-                        }
-                    });
-                }
+                // if (category.thumbnail) {
+                //     fs.unlink(filePath, (err) => {
+                //         if (err) {
+                //             console.log(err)
+                //         }
+                //     });
+                // }
+
+                // Upload to Cloudinary
+                let filePath = await cloudinary.uploader.upload(req.file.path, { folder: "haatEcommerce" });
+                catObj.thumbnail = filePath;
 
             }
 
@@ -125,8 +137,34 @@ exports.getSingleCategory = async (req, res) => {
 // Get All Category
 exports.getAllCategory = async (req, res) => {
     try {
-        const categories = await Category.find();
-        res.status(200).json(categories)
+        const currentPage = Number.parseInt(req.query.page, 10) || 1;
+        const itemPerPage = Number.parseInt(req.query.limit, 10) || 16;
+
+        const totalCategories = await Category.countDocuments()
+        const totalPage = Math.ceil(totalCategories / itemPerPage);
+
+        let categories;
+        if (currentPage) {
+            categories = await Category.find()
+                .sort({ title: 1 })
+                .skip((itemPerPage * currentPage) - itemPerPage)
+                .limit(itemPerPage)
+        } else {
+            categories = await Category.find().sort({ title: 1 })
+        }
+
+        if (currentPage > totalPage) {
+            return res.status(404).json({
+                message: 'No Page Found.'
+            })
+        }
+        res.status(200).json({
+            categories: categories,
+            totalPage: totalPage,
+            currentPage: currentPage,
+            totalCategories: totalCategories
+        })
+
     } catch (error) {
         console.log(error);
         res.status(500).json(error);
@@ -157,16 +195,17 @@ exports.deleteCategory = async (req, res) => {
 
             await Category.findByIdAndDelete(id);
 
-            if (category.thumbnail) {
-                const rootPath = await getRootPath();
-                const filePath = rootPath + '/public' + category.thumbnail
+            // For Local Folder's File
+            // if (category.thumbnail) {
+            //     const rootPath = await getRootPath();
+            //     const filePath = rootPath + '/public' + category.thumbnail
 
-                fs.unlink(filePath, (err) => {
-                    if (err) {
-                        console.log(err)
-                    }
-                });
-            }
+            //     fs.unlink(filePath, (err) => {
+            //         if (err) {
+            //             console.log(err)
+            //         }
+            //     });
+            // }
 
             res.status(200).json(category);
 
@@ -190,7 +229,7 @@ exports.deleteManyCategories = async (req, res) => {
 
             const categories = await Category.find({ _id: { $in: categoryIds } })
 
-            categories.forEach( async(category) => {
+            categories.forEach(async (category) => {
 
                 /*
                    **** Remove Category Thumbnail ***

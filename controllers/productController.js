@@ -138,7 +138,7 @@ exports.updateProduct = async (req, res) => {
 
 
                     // Upload to Cloudinary
-                    let filePath = await cloudinary.uploader.upload(req.files.thumbnail[0].path)
+                    let filePath = await cloudinary.uploader.upload(req.files.thumbnail[0].path , { folder: "haatEcommerce"})
                     productInfo.thumbnail = filePath.secure_url;
                 }
 
@@ -168,7 +168,7 @@ exports.updateProduct = async (req, res) => {
         
                         // Upload to Cloudinary
                         const { path } = file;
-                        let filePath = await cloudinary.uploader.upload(path)
+                        let filePath = await cloudinary.uploader.upload(path , { folder: "haatEcommerce"})
                         let fileUrl = filePath.secure_url;
                         galleryImages.push(fileUrl);
                     }
@@ -277,7 +277,7 @@ exports.getAllProducts = async (req, res) => {
 
     try {
         const currentPage = Number.parseInt(req.query.page, 10) || 1;
-        const itemPerPage = Number.parseInt(req.query.limit, 10) || 12;
+        const itemPerPage = Number.parseInt(req.query.limit, 10) || 16;
 
         const totalProducts = await Product.countDocuments()
         const totalPage = Math.ceil(totalProducts / itemPerPage);
