@@ -5,21 +5,25 @@ const bcrypt = require('bcrypt');
 // Update User
 exports.updateUser = async (req, res) => {
     const { id } = req.params;
-    const { firstName, lastName, currentPassword, newPassword } = req.body;
+    const { firstName, lastName, email, currentPassword, newPassword } = req.body;
     if (req.user.id === id || req.user.isAdmin) {
         try {
 
             const user = await User.findById(id);
             if (!user) return res.status(401).json({ message: 'User not found' });
 
-            if (!req.user.isAdmin) {
-                const matchPassword = await bcrypt.compare(currentPassword, user.password);
-                if (!matchPassword) return res.status(401).json({ message: 'Wrong Password' });
-            }
-
             const userData = {
                 firstName,
                 lastName,
+            }
+
+            if (email && req.user.isAdmin) {
+                userData.email = email;
+            }
+
+            if (!req.user.isAdmin) {
+                const matchPassword = await bcrypt.compare(currentPassword, user.password);
+                if (!matchPassword) return res.status(401).json({ message: 'Wrong Password' });
             }
             if (newPassword) {
                 const hashedPassword = await bcrypt.hash(newPassword, 12);
