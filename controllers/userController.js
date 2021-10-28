@@ -10,18 +10,19 @@ exports.updateUser = async (req, res) => {
         try {
 
             const user = await User.findById(id);
-            if (!user) return res.status(401).json({ message: 'Invalid Email Address' });
+            if (!user) return res.status(401).json({ message: 'User not found' });
 
-            const matchPassword = await bcrypt.compare(currentPassword, user.password);
-            if (!matchPassword) return res.status(401).json({ message: 'Wrong Password' });
-
-            const hashedPassword = await bcrypt.hash(newPassword, 12);
+            if (!req.user.isAdmin) {
+                const matchPassword = await bcrypt.compare(currentPassword, user.password);
+                if (!matchPassword) return res.status(401).json({ message: 'Wrong Password' });
+            }
 
             const userData = {
                 firstName,
                 lastName,
             }
             if (newPassword) {
+                const hashedPassword = await bcrypt.hash(newPassword, 12);
                 userData.password = hashedPassword
             }
 
