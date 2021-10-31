@@ -49,7 +49,7 @@ exports.signInControl = async (req, res) => {
                 isAdmin: user.isAdmin
             },
             process.env.JWT_SECRET,
-            { expiresIn: "7d" }
+            { expiresIn: "20s" }
         )
 
         const { password, ...other } = user._doc;
